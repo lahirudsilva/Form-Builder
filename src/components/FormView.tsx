@@ -23,7 +23,7 @@ export const FormView = () => {
                 case FieldType.String:
                     renderedFields.push(
                         <Grid item xs={12} key={key}>
-                            <InputField label={label} onChange={onChange} value={value}/>
+                            <InputField label={label} onChange={onChange} value={value} fieldType={field.type}/>
                         </Grid>
                     );
                     break;
