@@ -1,29 +1,47 @@
 import { FieldType } from "../store/form.ts";
 import { RootState } from "../store/config.ts";
+import { validationRules } from "./ValidationRules.ts";
+
+/**
+ * Validates a field value based on its type and enabled validation rules.
+ **/
 
 export const validateFieldValue = (
   fieldType: FieldType,
   value: string,
+  enabledValidationRules: string[],
   storeState: RootState
-): string | null => {
+): Array<string> => {
+  let errors: string[] = [];
+
+  // Validate based on field type
   switch (fieldType) {
     case FieldType.Number:
       if (!/^\d+$/.test(value)) {
-        return "Value must be a valid number";
+        // return "Value must be a valid number";
+        errors.push("Value must be a valid number");
       }
       break;
     case FieldType.String:
-      // Add your string-specific validation logic here
+      // Apply additional validation rules
+      for (const ruleName of enabledValidationRules) {
+        const ruleFn = validationRules[ruleName];
+        if (ruleFn) {
+          const validationError = ruleFn(value);
+
+          if (validationError) {
+            errors.push(validationError);
+          }
+        }
+      }
       break;
     case FieldType.Date:
-      // Add your date-specific validation logic here
       break;
     case FieldType.Boolean:
-      // Add your boolean-specific validation logic here
       break;
     default:
       throw new Error(`Unsupported field type: ${fieldType}`);
   }
 
-  return null; // If no validation error
+  return errors; // If no validation error
 };
